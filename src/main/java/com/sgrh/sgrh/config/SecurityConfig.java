@@ -17,13 +17,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.and())
+                .cors(cors -> {
+                }) // Activa CORS con la configuración por defecto de Spring
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/v1/clientes/registrar", "/api/v1/clientes/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(basic -> basic.and());
+                .httpBasic(basic -> {
+                }); // Activa la autenticación básica con valores por defecto
 
         return http.build();
     }
@@ -33,3 +35,39 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+
+// se debe aplicar el nuevo versionamiento.
+// @Bean
+// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+// http
+// .csrf(csrf -> csrf.disable())
+// .cors(cors -> cors.and())
+// .sessionManagement(session ->
+// session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+// .authorizeHttpRequests(authz -> authz
+// .requestMatchers("/api/v1/clientes/registrar",
+// "/api/v1/clientes/login").permitAll()
+// .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+// .anyRequest().authenticated())
+// .httpBasic(basic -> basic.and());
+
+// return http.build();
+// }
+
+// @Bean
+// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+// http
+// .csrf(csrf -> csrf.disable())
+// .cors(cors -> cors.withDefaults()) // Arregla la línea 20: usa withDefaults()
+// en lugar de .and()
+// .sessionManagement(session ->
+// session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+// .authorizeHttpRequests(authz -> authz
+// .requestMatchers("/api/v1/clientes/registrar",
+// "/api/v1/clientes/login").permitAll()
+// .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+// .anyRequest().authenticated())
+// .httpBasic(basic -> basic.withDefaults());
+
+// return http.build();
+// }
