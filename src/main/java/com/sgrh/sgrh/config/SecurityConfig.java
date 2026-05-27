@@ -22,6 +22,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/v1/clientes/registrar", "/api/v1/clientes/login").permitAll()
+                        // Permite SOLO el método POST en la ruta /api/v1/clientes
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/clientes").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/empleados").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(basic -> {
@@ -35,39 +38,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
-// se debe aplicar el nuevo versionamiento.
-// @Bean
-// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-// http
-// .csrf(csrf -> csrf.disable())
-// .cors(cors -> cors.and())
-// .sessionManagement(session ->
-// session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-// .authorizeHttpRequests(authz -> authz
-// .requestMatchers("/api/v1/clientes/registrar",
-// "/api/v1/clientes/login").permitAll()
-// .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-// .anyRequest().authenticated())
-// .httpBasic(basic -> basic.and());
-
-// return http.build();
-// }
-
-// @Bean
-// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-// http
-// .csrf(csrf -> csrf.disable())
-// .cors(cors -> cors.withDefaults()) // Arregla la línea 20: usa withDefaults()
-// en lugar de .and()
-// .sessionManagement(session ->
-// session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-// .authorizeHttpRequests(authz -> authz
-// .requestMatchers("/api/v1/clientes/registrar",
-// "/api/v1/clientes/login").permitAll()
-// .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-// .anyRequest().authenticated())
-// .httpBasic(basic -> basic.withDefaults());
-
-// return http.build();
-// }
