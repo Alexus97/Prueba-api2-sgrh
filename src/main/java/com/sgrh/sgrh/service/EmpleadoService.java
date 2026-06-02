@@ -1,10 +1,10 @@
 package com.sgrh.sgrh.service;
 
 import java.util.List;
-
 import com.sgrh.sgrh.dto.EmpleadoDTO;
 
 public interface EmpleadoService {
+    
     EmpleadoDTO crearEmpleado(EmpleadoDTO empleadoDTO);
 
     EmpleadoDTO obtenerEmpleadoById(Integer idEmpleado);
