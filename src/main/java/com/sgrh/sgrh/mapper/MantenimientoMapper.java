@@ -7,11 +7,12 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MantenimientoMapper {
+
     @Mapping(source = "habitacion.idHabitacion", target = "idHabitacion")
-    @Mapping(source = "estadoMantenimiento.idEstado", target = "idEstado")
+    @Mapping(source = "estado.idEstado", target = "idEstadoMantenimiento")
     MantenimientoDTO toDTO(Mantenimiento entity);
 
     @Mapping(source = "idHabitacion", target = "habitacion.idHabitacion")
-    @Mapping(source = "idEstado", target = "estadoMantenimiento.idEstado")
+    @Mapping(source = "idEstadoMantenimiento", target = "estado.idEstado")
     Mantenimiento toEntity(MantenimientoDTO dto);
 }

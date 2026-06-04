@@ -7,7 +7,10 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public record ServicioDTO(
+        @JsonIgnore
         Integer idServicio,
         @NotBlank(message = "El nombre no puede estar vacío")
         @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")

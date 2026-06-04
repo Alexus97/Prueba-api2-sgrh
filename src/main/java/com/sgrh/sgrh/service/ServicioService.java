@@ -1,7 +1,6 @@
 package com.sgrh.sgrh.service;
 
 import java.util.List;
-
 import com.sgrh.sgrh.dto.ServicioDTO;
 
 public interface ServicioService {
@@ -9,11 +8,9 @@ public interface ServicioService {
 
     ServicioDTO obtenerServicioById(Integer idServicio);
 
-    ServicioDTO obtenerServicioByNombre(String nombre);
+    List<ServicioDTO> obtenerTodos();
 
     ServicioDTO actualizarServicio(Integer idServicio, ServicioDTO servicioDTO);
 
     void eliminarServicio(Integer idServicio);
-
-    List<ServicioDTO> obtenerTodos();
 }

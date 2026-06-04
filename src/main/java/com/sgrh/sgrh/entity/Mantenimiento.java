@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Mantenimiento {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mantenimiento")
@@ -27,10 +28,10 @@ public class Mantenimiento {
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    @Column(name = "descripcion", length = 100, nullable = false)
+    @Column(name = "descripcion", length = 100)
     private String descripcion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estado_mantenimiento", nullable = false)
-    private Estado estadoMantenimiento;
+    private Estado estado;
 }

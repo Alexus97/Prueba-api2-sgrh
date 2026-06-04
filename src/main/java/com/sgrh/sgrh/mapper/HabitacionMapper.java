@@ -7,13 +7,12 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface HabitacionMapper {
-    @Mapping(source = "tipoHabitacion.idTipo", target = "idTipo")
+
     @Mapping(source = "sucursalHotel.idSucursal", target = "idSucursal")
-    @Mapping(source = "estadoHabitacion.idEstado", target = "idEstado")
+    @Mapping(source = "estado.idEstado", target = "idEstadoHabitacion")
     HabitacionDTO toDTO(Habitacion entity);
 
-    @Mapping(source = "idTipo", target = "tipoHabitacion.idTipo")
     @Mapping(source = "idSucursal", target = "sucursalHotel.idSucursal")
-    @Mapping(source = "idEstado", target = "estadoHabitacion.idEstado")
+    @Mapping(source = "idEstadoHabitacion", target = "estado.idEstado")
     Habitacion toEntity(HabitacionDTO dto);
 }

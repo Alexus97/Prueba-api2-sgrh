@@ -4,14 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sgrh.sgrh.dto.HabitacionDTO;
 import com.sgrh.sgrh.service.HabitacionService;
@@ -23,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/habitaciones")
 @RequiredArgsConstructor
 public class HabitacionController {
+
     private final HabitacionService habitacionService;
 
     @PostMapping
@@ -39,16 +33,6 @@ public class HabitacionController {
     @GetMapping
     public ResponseEntity<List<HabitacionDTO>> obtenerTodas() {
         return ResponseEntity.ok(habitacionService.obtenerTodas());
-    }
-
-    @GetMapping("/sucursal/{idSucursal}")
-    public ResponseEntity<List<HabitacionDTO>> obtenerHabitacionesBySucursal(@PathVariable Integer idSucursal) {
-        return ResponseEntity.ok(habitacionService.obtenerHabitacionesBySucursal(idSucursal));
-    }
-
-    @GetMapping("/estado/{idEstado}")
-    public ResponseEntity<List<HabitacionDTO>> obtenerHabitacionesByEstado(@PathVariable Integer idEstado) {
-        return ResponseEntity.ok(habitacionService.obtenerHabitacionesByEstado(idEstado));
     }
 
     @PutMapping("/{idHabitacion}")

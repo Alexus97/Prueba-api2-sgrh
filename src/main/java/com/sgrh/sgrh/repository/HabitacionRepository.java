@@ -8,7 +8,13 @@ import java.util.List;
 
 @Repository
 public interface HabitacionRepository extends JpaRepository<Habitacion, Integer> {
+    
+    // Busca por el número de habitación 
     List<Habitacion> findByNumero(Integer numero);
+    
+    // sucursalHotel (objeto) + IdSucursal (su llave primaria)
     List<Habitacion> findBySucursalHotelIdSucursal(Integer idSucursal);
-    List<Habitacion> findByEstadoHabitacionIdEstado(Integer idEstado);
+    
+    //  estado (objeto) + idEstado (su llave primaria)
+    List<Habitacion> findByEstadoIdEstado(Integer idEstado);
 }

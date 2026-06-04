@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface LimpiezaMapper {
+
     @Mapping(source = "habitacion.idHabitacion", target = "idHabitacion")
     @Mapping(source = "empleado.idEmpleado", target = "idEmpleado")
     LimpiezaDTO toDTO(Limpieza entity);

@@ -1,5 +1,7 @@
 package com.sgrh.sgrh.entity;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Estado {
+   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_estado")

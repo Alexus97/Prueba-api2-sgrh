@@ -21,20 +21,17 @@ public class SecurityConfig {
                 }) // Activa CORS con la configuración por defecto de Spring
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/v1/clientes/registrar", "/api/v1/clientes/login").permitAll()
-                        // Permite SOLO el método POST en la ruta /api/v1/clientes
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/clientes").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/empleados").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated())
-                .httpBasic(basic -> {
-                }); // Activa la autenticación básica con valores por defecto
-
+                        // .permitAll() a absolutamente todo en la aplicación (GET, POST, PUT, DELETE, etc.)
+                        .anyRequest().permitAll()
+                )
+                // Se quita .httpBasic() para evitar que el navegador solicite un modal de login
+                ;
         return http.build();
     }
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
+
