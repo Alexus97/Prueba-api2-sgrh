@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public record ReservaDTO(
+        @JsonIgnore
         Integer idReserva,
         @NotNull(message = "El cliente no puede ser nulo")
         Integer idCliente,
