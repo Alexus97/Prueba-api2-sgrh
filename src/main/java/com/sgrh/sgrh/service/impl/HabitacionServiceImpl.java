@@ -83,7 +83,6 @@ public class HabitacionServiceImpl implements HabitacionService {
     @Override
     @Transactional(readOnly = true)
     public List<HabitacionDTO> obtenerPorEstado(String tipoEstado) {
-        // Criterio HU: Si se consulta "disponible", usamos la constante explícita indexada en tu BD
         if ("disponible".equalsIgnoreCase(tipoEstado)) {
             return habitacionRepository.findByEstadoIdEstado(ESTADO_HABITACION_DISPONIBLE)
                     .stream()
@@ -91,7 +90,6 @@ public class HabitacionServiceImpl implements HabitacionService {
                     .toList();
         }
 
-        // Búsqueda genérica por la columna 'descripcion' o 'tipo' en caso de otros estados
         Estado estado = estadoRepository.findByTipo(tipoEstado)
                 .orElseThrow(() -> new ResourceNotFoundException("Estado no encontrado para el tipo: " + tipoEstado));
                 
@@ -109,7 +107,6 @@ public class HabitacionServiceImpl implements HabitacionService {
         Estado estado = estadoRepository.findById(idEstado)
                 .orElseThrow(() -> new ResourceNotFoundException("Estado no encontrado con ID: " + idEstado));
 
-        // Validación de negocio: Asegurar que el estado pertenezca al dominio de la habitación
         if (!"habitacion".equalsIgnoreCase(estado.getTipo())) {
             throw new IllegalArgumentException("El estado seleccionado ('" + estado.getDescripcion() + "') no es válido para una Habitación.");
         }
@@ -124,5 +121,26 @@ public class HabitacionServiceImpl implements HabitacionService {
             throw new ResourceNotFoundException("Habitación no encontrada con ID: " + idHabitacion);
         }
         habitacionRepository.deleteById(idHabitacion);
+    }
+
+    // =========================================================================
+    // IMPLEMENTACIÓN DE LA REGLA: LIBERAR HABITACIÓN (FIN JORNADA LIMPIEZA/MANT)
+    // =========================================================================
+    @Override
+    public HabitacionDTO liberarHabitacion(Integer idHabitacion) {
+        // 1. Buscamos la habitación que se acaba de limpiar/reparar
+        Habitacion habitacion = habitacionRepository.findById(idHabitacion)
+                .orElseThrow(() -> new ResourceNotFoundException("Habitación no encontrada con ID: " + idHabitacion));
+
+        // 2. Traemos el objeto de estado 'Disponible' desde la tabla maestra usando tu ID indexado (5)
+        Estado estadoDisponible = estadoRepository.findById(ESTADO_HABITACION_DISPONIBLE)
+                .orElseThrow(() -> new ResourceNotFoundException("Error Maestro: El estado 'Disponible' con ID " + ESTADO_HABITACION_DISPONIBLE + " no está configurado en la BD."));
+
+        // 3. Modificamos el estado en tiempo real y guardamos
+        habitacion.setEstado(estadoDisponible);
+        Habitacion habitacionLiberada = habitacionRepository.save(habitacion);
+
+        // 4. Retornamos los cambios mapeados a DTO para que el frontend actualice el color del cuadrante al instante
+        return habitacionMapper.toDTO(habitacionLiberada);
     }
 }

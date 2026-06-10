@@ -56,6 +56,12 @@ public class HabitacionController {
         return ResponseEntity.ok(habitacionService.cambiarEstado(idHabitacion, idEstado));
     }
 
+    @PostMapping("/{id}/liberar")
+public ResponseEntity<HabitacionDTO> liberarHabitacion(@PathVariable Integer id) {
+    HabitacionDTO liberada = habitacionService.liberarHabitacion(id);
+    return ResponseEntity.ok(liberada);
+}
+
     @DeleteMapping("/{idHabitacion}")
     public ResponseEntity<Void> eliminarHabitacion(@PathVariable Integer idHabitacion) {
         habitacionService.eliminarHabitacion(idHabitacion);

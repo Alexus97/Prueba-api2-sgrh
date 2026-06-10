@@ -11,4 +11,5 @@ public interface HabitacionService {
     void eliminarHabitacion(Integer idHabitacion);
     List<HabitacionDTO> obtenerPorEstado(String tipoEstado);
     HabitacionDTO cambiarEstado(Integer idHabitacion, Integer idEstado);
+    HabitacionDTO liberarHabitacion(Integer idHabitacion);
 }
