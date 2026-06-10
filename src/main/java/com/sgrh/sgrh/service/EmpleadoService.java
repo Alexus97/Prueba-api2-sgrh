@@ -1,19 +1,14 @@
 package com.sgrh.sgrh.service;
 
-import java.util.List;
 import com.sgrh.sgrh.dto.EmpleadoDTO;
+import java.util.List;
 
 public interface EmpleadoService {
+    EmpleadoDTO crearEmpleado(EmpleadoDTO dto);
+    List<EmpleadoDTO> listarEmpleados();
+    EmpleadoDTO buscarPorEmail(String email);
     
-    EmpleadoDTO crearEmpleado(EmpleadoDTO empleadoDTO);
-
-    EmpleadoDTO obtenerEmpleadoById(Integer idEmpleado);
-
-    EmpleadoDTO obtenerEmpleadoByEmail(String email);
-
-    EmpleadoDTO actualizarEmpleado(Integer idEmpleado, EmpleadoDTO empleadoDTO);
-
-    void eliminarEmpleado(Integer idEmpleado);
-
-    List<EmpleadoDTO> obtenerTodos();
+    // NUEVOS MÉTODOS para las HU actuales
+    EmpleadoDTO editarEmpleado(Integer id, EmpleadoDTO dto);
+    void eliminarEmpleado(Integer id);
 }

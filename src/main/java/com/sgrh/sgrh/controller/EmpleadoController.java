@@ -1,87 +1,68 @@
 package com.sgrh.sgrh.controller;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.sgrh.sgrh.dto.EmpleadoDTO;
 import com.sgrh.sgrh.service.EmpleadoService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.time.Instant;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/empleados")
 @RequiredArgsConstructor
-@Tag(name = "Empleados", description = "Endpoints para la gestión integral de empleados")
 public class EmpleadoController {
 
     private final EmpleadoService empleadoService;
 
-    // @PostMapping
-    // @Operation(summary = "Crear un nuevo empleado")
-    // public ResponseEntity<EmpleadoDTO> crearEmpleado(@Valid @RequestBody EmpleadoDTO empleadoDTO) {
-    //     return ResponseEntity.status(HttpStatus.CREATED)
-    //             .body(empleadoService.crearEmpleado(empleadoDTO));
-    // }
-
     @PostMapping
-    @Operation(summary = "Crear un nuevo empleado")
-    public ResponseEntity<EmpleadoDTO> crearEmpleado(@Valid @RequestBody EmpleadoDTO empleadoDTO) {
-    // 1. Ejecutamos tu servicio tal cual lo tienes
-    EmpleadoDTO empleadoCreado = empleadoService.crearEmpleado(empleadoDTO);
-    
-    // 2. Retornamos el 201 Created, agregamos el mensaje en las cabeceras y pasamos el cuerpo
-    return ResponseEntity.status(HttpStatus.CREATED)
-            .header("X-Status-Message", "El empleado se creo correctamente.") // <- Tu mensaje aquí
-            .body(empleadoCreado);
-}
-
-    @GetMapping("/{idEmpleado}")
-    @Operation(summary = "Obtener un empleado por su ID")
-    public ResponseEntity<EmpleadoDTO> obtenerEmpleado(@PathVariable Integer idEmpleado) {
-        return ResponseEntity.ok(empleadoService.obtenerEmpleadoById(idEmpleado));
+    public ResponseEntity<?> registrarEmpleado(@Valid @RequestBody EmpleadoDTO dto) {
+        try {
+            EmpleadoDTO nuevoEmpleado = empleadoService.crearEmpleado(dto);
+            return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(crearEstructuraError(e.getMessage(), "/api/v1/empleados"));
+        }
     }
 
-    /* * CORRECCIÓN CRÍTICA: Se cambió de @PathVariable a @RequestParam 
-     * Ruta final: /api/v1/empleados/buscar?email=ejemplo@correo.com
-     */
-    @GetMapping("/buscar")
-    @Operation(summary = "Buscar un empleado por su correo electrónico")
-    public ResponseEntity<EmpleadoDTO> obtenerEmpleadoByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(empleadoService.obtenerEmpleadoByEmail(email));
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarEmpleado(@PathVariable Integer id, @Valid @RequestBody EmpleadoDTO dto) {
+        try {
+            EmpleadoDTO editado = empleadoService.editarEmpleado(id, dto);
+            return ResponseEntity.ok(editado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(crearEstructuraError(e.getMessage(), "/api/v1/empleados/" + id));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> borrarEmpleado(@PathVariable Integer id) {
+        try {
+            empleadoService.eliminarEmpleado(id);
+            return ResponseEntity.ok("Confirmación: El empleado con ID " + id + " ha sido eliminado correctamente del sistema.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(crearEstructuraError(e.getMessage(), "/api/v1/empleados/" + id));
+        }
     }
 
     @GetMapping
-    @Operation(summary = "Listar todos los empleados")
     public ResponseEntity<List<EmpleadoDTO>> obtenerTodos() {
-        return ResponseEntity.ok(empleadoService.obtenerTodos());
+        return ResponseEntity.ok(empleadoService.listarEmpleados());
     }
 
-    @PutMapping("/{idEmpleado}")
-    @Operation(summary = "Actualizar los datos de un empleado")
-    public ResponseEntity<EmpleadoDTO> actualizarEmpleado(
-            @PathVariable Integer idEmpleado,
-            @Valid @RequestBody EmpleadoDTO empleadoDTO) {
-        return ResponseEntity.ok(empleadoService.actualizarEmpleado(idEmpleado, empleadoDTO));
+    @GetMapping("/buscar")
+    public ResponseEntity<EmpleadoDTO> obtenerPorEmail(@RequestParam String email) {
+        return ResponseEntity.ok(empleadoService.buscarPorEmail(email));
     }
 
-    @DeleteMapping("/{idEmpleado}")
-    @Operation(summary = "Eliminar un empleado del sistema")
-    public ResponseEntity<Void> eliminarEmpleado(@PathVariable Integer idEmpleado) {
-        empleadoService.eliminarEmpleado(idEmpleado);
-        return ResponseEntity.noContent().build();
+    // Método auxiliar para construir el JSON que el frontend necesita leer (.detail)
+    private ProblemDetail crearEstructuraError(String mensaje, String ruta) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, mensaje);
+        pd.setTitle("Bad Request");
+        pd.setProperty("timestamp", Instant.now());
+        return pd;
     }
 }
