@@ -2,11 +2,8 @@ server:
   port: 8081
 
 spring:
-  application:
-    name: SGRSH - Sistema de Gestión de Reservas y Servicios Hoteleros
-
-  datasource: 
-    url: jdbc:mysql://localhost:3306/hotel_reservas?useSSL=false&serverTimezone=UTC
+  datasource:
+    url: jdbc:mysql://localhost:3306/hotel_reservas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver

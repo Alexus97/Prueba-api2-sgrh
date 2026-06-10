@@ -1,23 +1,23 @@
 package com.sgrh.sgrh.service.impl;
 
-import java.util.List;
+import com.sgrh.sgrh.dto.MantenimientoDTO;
+import com.sgrh.sgrh.entity.Estado;
+import com.sgrh.sgrh.entity.Habitacion;
+import com.sgrh.sgrh.entity.Mantenimiento;
+import com.sgrh.sgrh.mapper.MantenimientoMapper;
+import com.sgrh.sgrh.repository.MantenimientoRepository;
+import com.sgrh.sgrh.repository.HabitacionRepository; // Asegúrate de tenerlo importado
+import com.sgrh.sgrh.repository.EstadoRepository;     // Asegúrate de tenerlo importado
+import com.sgrh.sgrh.service.MantenimientoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sgrh.sgrh.dto.MantenimientoDTO;
-import com.sgrh.sgrh.entity.Mantenimiento;
-import com.sgrh.sgrh.exception.ResourceNotFoundException;
-import com.sgrh.sgrh.mapper.MantenimientoMapper;
-import com.sgrh.sgrh.repository.MantenimientoRepository;
-import com.sgrh.sgrh.repository.HabitacionRepository;
-import com.sgrh.sgrh.repository.EstadoRepository;
-import com.sgrh.sgrh.service.MantenimientoService;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MantenimientoServiceImpl implements MantenimientoService {
 
     private final MantenimientoRepository mantenimientoRepository;
@@ -26,60 +26,38 @@ public class MantenimientoServiceImpl implements MantenimientoService {
     private final MantenimientoMapper mantenimientoMapper;
 
     @Override
-    public MantenimientoDTO crearMantenimiento(MantenimientoDTO mantenimientoDTO) {
-        // Validación de llaves foráneas antes de guardar
-        if (!habitacionRepository.existsById(mantenimientoDTO.idHabitacion())) {
-            throw new ResourceNotFoundException("La Habitación con ID " + mantenimientoDTO.idHabitacion() + " no existe.");
-        }
-        if (!estadoRepository.existsById(mantenimientoDTO.idEstadoMantenimiento())) {
-            throw new ResourceNotFoundException("El Estado con ID " + mantenimientoDTO.idEstadoMantenimiento() + " no existe.");
-        }
+    @Transactional
+    public MantenimientoDTO registrarMantenimiento(MantenimientoDTO dto) {
+        // 1. Buscar la Habitación
+        Habitacion habitacion = habitacionRepository.findById(dto.idHabitacion())
+                .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
 
-        Mantenimiento mantenimiento = mantenimientoMapper.toEntity(mantenimientoDTO);
+        // 2. Buscar el Estado del Mantenimiento (Ej: 8 = Pendiente, 9 = En Proceso)
+        Estado estadoMantenimiento = estadoRepository.findById(dto.idEstadoMantenimiento())
+                .orElseThrow(() -> new RuntimeException("Estado de mantenimiento no encontrado"));
+
+        // 3. Convertir DTO a Entidad e inyectar relaciones del modelo
+        Mantenimiento mantenimiento = mantenimientoMapper.toEntity(dto);
+        mantenimiento.setHabitacion(habitacion);
+        mantenimiento.setEstado(estadoMantenimiento);
+
+        // 4. CRITERIO DE ACEPTACIÓN: Forzar que la habitación pase a estado 7 (En mantenimiento)
+        Estado estadoBloqueado = estadoRepository.findById(7)
+                .orElseThrow(() -> new RuntimeException("Estado 'En Mantenimiento' (7) no existe en la BD"));
+        habitacion.setEstado(estadoBloqueado);
+        habitacionRepository.save(habitacion); // Persiste el cambio de estado de la habitación en tiempo real
+
+        // 5. Guardar la actividad de mantenimiento
         Mantenimiento guardado = mantenimientoRepository.save(mantenimiento);
         return mantenimientoMapper.toDTO(guardado);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MantenimientoDTO obtenerMantenimientoById(Integer idMantenimiento) {
-        Mantenimiento mantenimiento = mantenimientoRepository.findById(idMantenimiento)
-                .orElseThrow(() -> new ResourceNotFoundException("Mantenimiento no encontrado con ID: " + idMantenimiento));
-        return mantenimientoMapper.toDTO(mantenimiento);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<MantenimientoDTO> obtenerTodos() {
-        return mantenimientoRepository.findAll()
-                .stream()
+    public List<MantenimientoDTO> obtenerHistorial() {
+        // Criterio de aceptación: Llevar e historial de mantenimiento
+        return mantenimientoRepository.findAll().stream()
                 .map(mantenimientoMapper::toDTO)
-                .toList();
-    }
-
-    @Override
-    public MantenimientoDTO actualizarMantenimiento(Integer idMantenimiento, MantenimientoDTO mantenimientoDTO) {
-        if (!mantenimientoRepository.existsById(idMantenimiento)) {
-            throw new ResourceNotFoundException("Mantenimiento no encontrado con ID: " + idMantenimiento);
-        }
-        if (!habitacionRepository.existsById(mantenimientoDTO.idHabitacion())) {
-            throw new ResourceNotFoundException("La Habitación con ID " + mantenimientoDTO.idHabitacion() + " no existe.");
-        }
-        if (!estadoRepository.existsById(mantenimientoDTO.idEstadoMantenimiento())) {
-            throw new ResourceNotFoundException("El Estado con ID " + mantenimientoDTO.idEstadoMantenimiento() + " no existe.");
-        }
-
-        Mantenimiento actualizado = mantenimientoMapper.toEntity(mantenimientoDTO);
-        actualizado.setIdMantenimiento(idMantenimiento);
-        Mantenimiento guardado = mantenimientoRepository.save(actualizado);
-        return mantenimientoMapper.toDTO(guardado);
-    }
-
-    @Override
-    public void eliminarMantenimiento(Integer idMantenimiento) {
-        if (!mantenimientoRepository.existsById(idMantenimiento)) {
-            throw new ResourceNotFoundException("Mantenimiento no encontrado con ID: " + idMantenimiento);
-        }
-        mantenimientoRepository.deleteById(idMantenimiento);
+                .collect(Collectors.toList());
     }
 }

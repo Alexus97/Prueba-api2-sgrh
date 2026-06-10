@@ -1,114 +1,67 @@
 package com.sgrh.sgrh.service.impl;
 
-import java.time.LocalDate;
-import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.sgrh.sgrh.dto.LimpiezaDTO;
+import com.sgrh.sgrh.entity.Empleado;
+import com.sgrh.sgrh.entity.Estado;
+import com.sgrh.sgrh.entity.Habitacion;
 import com.sgrh.sgrh.entity.Limpieza;
-import com.sgrh.sgrh.exception.ResourceNotFoundException;
 import com.sgrh.sgrh.mapper.LimpiezaMapper;
 import com.sgrh.sgrh.repository.LimpiezaRepository;
 import com.sgrh.sgrh.repository.HabitacionRepository;
 import com.sgrh.sgrh.repository.EmpleadoRepository;
+import com.sgrh.sgrh.repository.EstadoRepository;
 import com.sgrh.sgrh.service.LimpiezaService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LimpiezaServiceImpl implements LimpiezaService {
 
     private final LimpiezaRepository limpiezaRepository;
     private final HabitacionRepository habitacionRepository;
     private final EmpleadoRepository empleadoRepository;
+    private final EstadoRepository estadoRepository;
     private final LimpiezaMapper limpiezaMapper;
 
     @Override
-    public LimpiezaDTO crearLimpieza(LimpiezaDTO limpiezaDTO) {
-        if (!habitacionRepository.existsById(limpiezaDTO.idHabitacion())) {
-            throw new ResourceNotFoundException("La Habitación con ID " + limpiezaDTO.idHabitacion() + " no existe.");
-        }
-        if (!empleadoRepository.existsById(limpiezaDTO.idEmpleado())) {
-            throw new ResourceNotFoundException("El Empleado con ID " + limpiezaDTO.idEmpleado() + " no existe.");
-        }
+    @Transactional
+    public LimpiezaDTO asignarLimpieza(LimpiezaDTO dto) {
+        // 1. Validar Habitación
+        Habitacion habitacion = habitacionRepository.findById(dto.idHabitacion())
+                .orElseThrow(() -> new RuntimeException("Habitación no encontrada con ID: " + dto.idHabitacion()));
 
-        Limpieza limpieza = limpiezaMapper.toEntity(limpiezaDTO);
+        // 2. Validar Empleado
+        Empleado empleado = empleadoRepository.findById(dto.idEmpleado())
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + dto.idEmpleado()));
+
+        // 3. Mapear y enlazar relaciones
+        Limpieza limpieza = limpiezaMapper.toEntity(dto);
+        limpieza.setHabitacion(habitacion);
+        limpieza.setEmpleado(empleado);
+        
+        limpieza.setEstado(dto.estado() != null ? dto.estado() : "PENDIENTE");
+
+        // 4. Bloquear habitación poniéndola en Mantenimiento/Limpieza (ID 7)
+        Estado estadoBloqueado = estadoRepository.findById(7)
+                .orElseThrow(() -> new RuntimeException("El estado maestro con ID 7 no existe en la BD"));
+        habitacion.setEstado(estadoBloqueado);
+        habitacionRepository.save(habitacion); 
+
+        // 5. Persistir
         Limpieza guardada = limpiezaRepository.save(limpieza);
         return limpiezaMapper.toDTO(guardada);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public LimpiezaDTO obtenerLimpiezaById(Integer idLimpieza) {
-        Limpieza limpieza = limpiezaRepository.findById(idLimpieza)
-                .orElseThrow(() -> new ResourceNotFoundException("Registro de Limpieza no encontrado con ID: " + idLimpieza));
-        return limpiezaMapper.toDTO(limpieza);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LimpiezaDTO> obtenerTodas() {
-        return limpiezaRepository.findAll()
-                .stream()
+    public List<LimpiezaDTO> obtenerHistorialLimpieza() {
+        return limpiezaRepository.findAll().stream()
                 .map(limpiezaMapper::toDTO)
-                .toList();
-    }
-
-    @Override
-    public LimpiezaDTO actualizarLimpieza(Integer idLimpieza, LimpiezaDTO limpiezaDTO) {
-        if (!limpiezaRepository.existsById(idLimpieza)) {
-            throw new ResourceNotFoundException("Registro de Limpieza no encontrado con ID: " + idLimpieza);
-        }
-        if (!habitacionRepository.existsById(limpiezaDTO.idHabitacion())) {
-            throw new ResourceNotFoundException("La Habitación con ID " + limpiezaDTO.idHabitacion() + " no existe.");
-        }
-        if (!empleadoRepository.existsById(limpiezaDTO.idEmpleado())) {
-            throw new ResourceNotFoundException("El Empleado con ID " + limpiezaDTO.idEmpleado() + " no existe.");
-        }
-
-        Limpieza actualizada = limpiezaMapper.toEntity(limpiezaDTO);
-        actualizada.setIdLimpieza(idLimpieza);
-        Limpieza guardada = limpiezaRepository.save(actualizada);
-        return limpiezaMapper.toDTO(guardada);
-    }
-
-    @Override
-    public void eliminarLimpieza(Integer idLimpieza) {
-        if (!limpiezaRepository.existsById(idLimpieza)) {
-            throw new ResourceNotFoundException("Registro de Limpieza no encontrado con ID: " + idLimpieza);
-        }
-        limpiezaRepository.deleteById(idLimpieza);
-    }
-
-    // --- Mapeos de consultas personalizadas del repositorio ---
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LimpiezaDTO> obtenerPorHabitacion(Integer idHabitacion) {
-        return limpiezaRepository.findByHabitacionIdHabitacion(idHabitacion)
-                .stream()
-                .map(limpiezaMapper::toDTO)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LimpiezaDTO> obtenerPorFecha(LocalDate fecha) {
-        return limpiezaRepository.findByFecha(fecha)
-                .stream()
-                .map(limpiezaMapper::toDTO)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LimpiezaDTO> obtenerPorEstado(String estado) {
-        return limpiezaRepository.findByEstado(estado)
-                .stream()
-                .map(limpiezaMapper::toDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

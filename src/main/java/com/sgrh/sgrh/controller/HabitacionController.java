@@ -42,6 +42,20 @@ public class HabitacionController {
         return ResponseEntity.ok(habitacionService.actualizarHabitacion(idHabitacion, habitacionDTO));
     }
 
+    // Habitaciones disponibles para reserva
+    @GetMapping("/disponibles")
+    public ResponseEntity<List<HabitacionDTO>> obtenerDisponibles() {
+        return ResponseEntity.ok(habitacionService.obtenerPorEstado("disponible"));
+    }
+
+    // Cambiar estado de una habitación específica
+    @PatchMapping("/{idHabitacion}/estado/{idEstado}")
+    public ResponseEntity<HabitacionDTO> cambiarEstado(
+            @PathVariable Integer idHabitacion,
+            @PathVariable Integer idEstado) {
+        return ResponseEntity.ok(habitacionService.cambiarEstado(idHabitacion, idEstado));
+    }
+
     @DeleteMapping("/{idHabitacion}")
     public ResponseEntity<Void> eliminarHabitacion(@PathVariable Integer idHabitacion) {
         habitacionService.eliminarHabitacion(idHabitacion);

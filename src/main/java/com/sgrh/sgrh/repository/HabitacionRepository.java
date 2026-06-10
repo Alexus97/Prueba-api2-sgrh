@@ -15,6 +15,13 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Integer>
     // sucursalHotel (objeto) + IdSucursal (su llave primaria)
     List<Habitacion> findBySucursalHotelIdSucursal(Integer idSucursal);
     
-    //  estado (objeto) + idEstado (su llave primaria)
+    // estado (objeto) + idEstado (su llave primaria)
     List<Habitacion> findByEstadoIdEstado(Integer idEstado);
+
+    /**
+     * HU: No se deben mostrar habitaciones no disponibles en el proceso de reserva.
+     * Este método permite buscar directamente por el nombre del estado (ej: "Disponible", "Mantenimiento").
+     * Spring Data JPA caminará automáticamente de Habitacion -> Estado -> tipo.
+     */
+    List<Habitacion> findByEstadoTipo(String tipoEstado);
 }

@@ -4,15 +4,16 @@ import com.sgrh.sgrh.dto.LimpiezaDTO;
 import com.sgrh.sgrh.entity.Limpieza;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface LimpiezaMapper {
 
     @Mapping(source = "habitacion.idHabitacion", target = "idHabitacion")
     @Mapping(source = "empleado.idEmpleado", target = "idEmpleado")
     LimpiezaDTO toDTO(Limpieza entity);
 
-    @Mapping(source = "idHabitacion", target = "habitacion.idHabitacion")
-    @Mapping(source = "idEmpleado", target = "empleado.idEmpleado")
+    @Mapping(target = "habitacion", ignore = true)
+    @Mapping(target = "empleado", ignore = true)
     Limpieza toEntity(LimpiezaDTO dto);
 }

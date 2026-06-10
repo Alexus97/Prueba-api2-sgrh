@@ -4,9 +4,11 @@ import com.sgrh.sgrh.dto.ReservaHabitacionDTO;
 import com.sgrh.sgrh.entity.ReservaHabitacion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ReservaHabitacionMapper {
+
     @Mapping(source = "reserva.idReserva", target = "idReserva")
     @Mapping(source = "habitacion.idHabitacion", target = "idHabitacion")
     ReservaHabitacionDTO toDTO(ReservaHabitacion entity);

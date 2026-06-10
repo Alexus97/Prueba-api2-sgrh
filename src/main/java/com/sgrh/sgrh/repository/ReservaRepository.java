@@ -9,7 +9,13 @@ import java.util.List;
 
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
+
+    // Convención JPA: cliente (objeto) + IdCliente (llave primaria de Cliente)
     List<Reserva> findByClienteIdCliente(Integer idCliente);
-    List<Reserva> findByFechaEntradaAndFechaSalida(LocalDate fechaEntrada, LocalDate fechaSalida);
+
+    // Convención JPA: estadoReserva (objeto) + IdEstado (llave primaria de Estado)
     List<Reserva> findByEstadoReservaIdEstado(Integer idEstado);
+
+    // Búsqueda por rango de fechas
+    List<Reserva> findByFechaEntradaAndFechaSalida(LocalDate fechaEntrada, LocalDate fechaSalida);
 }
