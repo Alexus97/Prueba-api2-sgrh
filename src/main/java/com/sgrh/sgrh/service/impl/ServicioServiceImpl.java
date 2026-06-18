@@ -1,7 +1,6 @@
 package com.sgrh.sgrh.service.impl;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class ServicioServiceImpl implements ServicioService {
+
     private final ServicioRepository servicioRepository;
     private final ServicioMapper servicioMapper;
 
@@ -31,35 +31,8 @@ public class ServicioServiceImpl implements ServicioService {
     @Transactional(readOnly = true)
     public ServicioDTO obtenerServicioById(Integer idServicio) {
         var servicio = servicioRepository.findById(idServicio)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado con ID: " + idServicio));
         return servicioMapper.toDTO(servicio);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ServicioDTO obtenerServicioByNombre(String nombre) {
-        var servicio = servicioRepository.findByNombre(nombre)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
-        return servicioMapper.toDTO(servicio);
-    }
-
-    @Override
-    public ServicioDTO actualizarServicio(Integer idServicio, ServicioDTO servicioDTO) {
-        var servicio = servicioRepository.findById(idServicio)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
-
-        var servicioActualizado = servicioMapper.toEntity(servicioDTO);
-        servicioActualizado.setIdServicio(idServicio);
-        var servicioGuardado = servicioRepository.save(servicioActualizado);
-        return servicioMapper.toDTO(servicioGuardado);
-    }
-
-    @Override
-    public void eliminarServicio(Integer idServicio) {
-        if (!servicioRepository.existsById(idServicio)) {
-            throw new ResourceNotFoundException("Servicio no encontrado");
-        }
-        servicioRepository.deleteById(idServicio);
     }
 
     @Override
@@ -69,5 +42,24 @@ public class ServicioServiceImpl implements ServicioService {
                 .stream()
                 .map(servicioMapper::toDTO)
                 .toList();
+    }
+
+    @Override
+    public ServicioDTO actualizarServicio(Integer idServicio, ServicioDTO servicioDTO) {
+        if (!servicioRepository.existsById(idServicio)) {
+            throw new ResourceNotFoundException("Servicio no encontrado con ID: " + idServicio);
+        }
+        var servicioActualizado = servicioMapper.toEntity(servicioDTO);
+        servicioActualizado.setIdServicio(idServicio); // Aseguramos que conserve el ID de la URL
+        var servicioGuardado = servicioRepository.save(servicioActualizado);
+        return servicioMapper.toDTO(servicioGuardado);
+    }
+
+    @Override
+    public void eliminarServicio(Integer idServicio) {
+        if (!servicioRepository.existsById(idServicio)) {
+            throw new ResourceNotFoundException("Servicio no encontrado con ID: " + idServicio);
+        }
+        servicioRepository.deleteById(idServicio);
     }
 }

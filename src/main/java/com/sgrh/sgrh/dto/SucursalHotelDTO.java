@@ -1,9 +1,12 @@
 package com.sgrh.sgrh.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record SucursalHotelDTO(
+        @JsonIgnore
         Integer idSucursal,
         @NotBlank(message = "El nombre no puede estar vacío")
         @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")

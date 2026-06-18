@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface EmpleadoMapper {
+    
     EmpleadoDTO toDTO(Empleado entity);
+    
     Empleado toEntity(EmpleadoDTO dto);
 }

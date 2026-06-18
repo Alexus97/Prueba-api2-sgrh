@@ -1,11 +1,11 @@
 package com.sgrh.sgrh.service;
 
+import com.sgrh.sgrh.dto.ReservaDTO;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.sgrh.sgrh.dto.ReservaDTO;
-
 public interface ReservaService {
+
     ReservaDTO crearReserva(ReservaDTO reservaDTO);
 
     ReservaDTO obtenerReservaById(Integer idReserva);

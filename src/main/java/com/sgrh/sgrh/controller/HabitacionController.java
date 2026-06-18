@@ -4,14 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sgrh.sgrh.dto.HabitacionDTO;
 import com.sgrh.sgrh.service.HabitacionService;
@@ -23,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/habitaciones")
 @RequiredArgsConstructor
 public class HabitacionController {
+
     private final HabitacionService habitacionService;
 
     @PostMapping
@@ -41,22 +35,32 @@ public class HabitacionController {
         return ResponseEntity.ok(habitacionService.obtenerTodas());
     }
 
-    @GetMapping("/sucursal/{idSucursal}")
-    public ResponseEntity<List<HabitacionDTO>> obtenerHabitacionesBySucursal(@PathVariable Integer idSucursal) {
-        return ResponseEntity.ok(habitacionService.obtenerHabitacionesBySucursal(idSucursal));
-    }
-
-    @GetMapping("/estado/{idEstado}")
-    public ResponseEntity<List<HabitacionDTO>> obtenerHabitacionesByEstado(@PathVariable Integer idEstado) {
-        return ResponseEntity.ok(habitacionService.obtenerHabitacionesByEstado(idEstado));
-    }
-
     @PutMapping("/{idHabitacion}")
     public ResponseEntity<HabitacionDTO> actualizarHabitacion(
             @PathVariable Integer idHabitacion,
             @Valid @RequestBody HabitacionDTO habitacionDTO) {
         return ResponseEntity.ok(habitacionService.actualizarHabitacion(idHabitacion, habitacionDTO));
     }
+
+    // Habitaciones disponibles para reserva
+    @GetMapping("/disponibles")
+    public ResponseEntity<List<HabitacionDTO>> obtenerDisponibles() {
+        return ResponseEntity.ok(habitacionService.obtenerPorEstado("disponible"));
+    }
+
+    // Cambiar estado de una habitación específica
+    @PatchMapping("/{idHabitacion}/estado/{idEstado}")
+    public ResponseEntity<HabitacionDTO> cambiarEstado(
+            @PathVariable Integer idHabitacion,
+            @PathVariable Integer idEstado) {
+        return ResponseEntity.ok(habitacionService.cambiarEstado(idHabitacion, idEstado));
+    }
+
+    @PostMapping("/{id}/liberar")
+public ResponseEntity<HabitacionDTO> liberarHabitacion(@PathVariable Integer id) {
+    HabitacionDTO liberada = habitacionService.liberarHabitacion(id);
+    return ResponseEntity.ok(liberada);
+}
 
     @DeleteMapping("/{idHabitacion}")
     public ResponseEntity<Void> eliminarHabitacion(@PathVariable Integer idHabitacion) {

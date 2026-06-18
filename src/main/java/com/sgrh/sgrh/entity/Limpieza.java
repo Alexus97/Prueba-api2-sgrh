@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Limpieza {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_limpieza")
@@ -31,6 +32,6 @@ public class Limpieza {
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    @Column(name = "estado", length = 50, nullable = false)
+    @Column(name = "estado", length = 50)
     private String estado;
 }

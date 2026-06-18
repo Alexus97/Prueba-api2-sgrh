@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 public interface PromocionRepository extends JpaRepository<Promocion, Integer> {
-    List<Promocion> findByFechaInicioBefore(LocalDate fecha);
-    List<Promocion> findByFechaFinAfter(LocalDate fecha);
+    
+    // Filtro nativo mediante convención de nombres: fechaInicio <= fecha AND fechaFin >= fecha
+    List<Promocion> findByFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(LocalDate fechaInicio, LocalDate fechaFin);
 }

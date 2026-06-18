@@ -4,14 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sgrh.sgrh.dto.ServicioDTO;
 import com.sgrh.sgrh.service.ServicioService;
@@ -23,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/servicios")
 @RequiredArgsConstructor
 public class ServicioController {
+
     private final ServicioService servicioService;
 
     @PostMapping
@@ -34,11 +28,6 @@ public class ServicioController {
     @GetMapping("/{idServicio}")
     public ResponseEntity<ServicioDTO> obtenerServicio(@PathVariable Integer idServicio) {
         return ResponseEntity.ok(servicioService.obtenerServicioById(idServicio));
-    }
-
-    @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<ServicioDTO> obtenerServicioByNombre(@PathVariable String nombre) {
-        return ResponseEntity.ok(servicioService.obtenerServicioByNombre(nombre));
     }
 
     @GetMapping

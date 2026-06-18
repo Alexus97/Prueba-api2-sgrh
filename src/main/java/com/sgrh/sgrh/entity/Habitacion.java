@@ -15,14 +15,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class Habitacion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_habitacion")
     private Integer idHabitacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_tipo", nullable = false)
-    private TipoHabitacion tipoHabitacion;
+    @Column(name = "id_tipo", nullable = false)
+    private Integer idTipo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sucursal", nullable = false)
@@ -39,5 +39,5 @@ public class Habitacion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estado_habitacion", nullable = false)
-    private Estado estadoHabitacion;
+    private Estado estado;
 }

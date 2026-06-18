@@ -1,11 +1,11 @@
-spring:
-  application:
-    name: SGRSH - Sistema de Gestión de Reservas y Servicios Hoteleros
+server:
+  port: 8081
 
+spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/hotel_tolimagrande?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/hotel_reservas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: Lexus97@
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10

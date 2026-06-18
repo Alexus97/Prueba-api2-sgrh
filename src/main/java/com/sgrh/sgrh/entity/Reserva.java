@@ -24,6 +24,9 @@ public class Reserva {
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
+    // Se eliminó la relación directa con Habitacion de aquí, 
+    // porque ahora vive en ReservaHabitacion según tu diagrama de BD.
+
     @Column(name = "fecha_reserva", nullable = false)
     private LocalDate fechaReserva;
 
